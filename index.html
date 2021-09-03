@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climats</title>
+    <!-- <link rel="stylesheet" href="../css/main.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <!-- <script src="js/clima.js"></script> -->
+    
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            width: 100%;
+            color: white;
+        }
+
+        .weather-container {
+            width: 100%;
+            height: 100vh;
+            background-image: url(./img/frio.jpeg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;            
+        }
+
+        .weather-container:before{
+            content: "";
+            width: 100%;
+            min-height: 100vh;
+            position:absolute;
+            /* background-image: linear-gradient(rgba(5,7,12,0.18), rgba(5,7,12,0.04)); */
+            background-color: rgba(0,0,0,0.6)
+        }
+
+        .w-navbar {
+            height: 10%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .w-body {
+            height: 70%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: relative;
+        }
+
+        .w-body .current {
+            width: 40%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .w-body .current h2 {
+            font-size: 7em;
+            position: relative;
+        }
+
+        .w-body .location-container {
+            width: 60%;
+        }
+
+        .location-container .location  h2 {
+            font-size: 3em;
+        }
+
+        .w-forecast {
+            height: 20%;
+            position: relative;
+        }
+
+        .time-container {
+            display: flex;
+        }
+
+        .search-container {
+            margin: 0 30px;
+            padding: 4%;
+        }
+
+        .search-container input {
+            padding: 8px 12px;
+            border: 1px solid rgba(1,1,1,0.3);
+            border-radius: 15px;
+            width: 120%;
+            outline: none;
+        }
+
+        .hamburguer-menu {
+            position: fixed;
+            top: 16px;
+            padding: 10px 20px;            
+        }
+
+        .date, .time{
+            margin: 5px;
+            padding: 2px 3px;
+        }
+
+        .btn-flotante {
+            font-size: 14px;
+            text-transform: uppercase; /* Texto en mayusculas */
+            font-weight: bold; /* Fuente en negrita o bold */
+            color: #ffffff; /* Color del texto */
+            border-radius: 28px; /* Borde del boton */
+            background-color: #E91E63; /* Color de fondo */
+            padding: 13px 16px; /* Relleno del boton */
+            position: fixed;
+            bottom: 170px;
+            right: 40px;
+            list-style: none; /*Quitar estilos por default*/
+        }
+        
+        .btn-flotante:hover {
+            background-color: #2c2fa5; /* Color de fondo al pasar el cursor */
+            transform: translateY(-7px);
+        }
+
+        .hamburguer-menu{
+            display: none;
+        }
+
+        @media (max-width: 650px) {   /*Se hace esto en dispositivos menos de 950 pixeles*/
+            .w-body {
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .w-navbar {
+                justify-content: center;
+            }
+
+            .search-container input {
+                width: 200px;
+            }
+
+            .w-body .location-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-flotante {
+                font-size: 10px;
+                padding: 13px 14px; 
+                right: 20px;
+                bottom: 125px;
+            }
+
+            .hamburguer-menu{
+                display: block;
+            }
+
+            .hamburguer-menu-cerrar{
+                background-color: rgba(0,0,0,0.92); /* Color de fondo */
+                position: fixed;
+                bottom: 418px;
+                right: 40px;
+                color:white;
+                display: block;
+                
+            }
+
+        }  
+        
+    .mobile-menu {
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0,0,0,0.92);
+        display: none;
+        position: fixed;
+        top: 0;
+        text-align: center;
+        transition: all .5s;
+    }  
+    
+    .mobile-menu li {
+        line-height: 60px;
+        display: block;
+        margin: 50px 0;
+    }
+    
+    .mobile-menu li a{
+        color: white;
+        font-size: 16px;
+        text-transform: uppercase;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .mobile-menu li a.action, .mobile-menu li a:hover{
+        color:#E91E63;
+        transition: .3s;
+    }
+    .ulforecast{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        list-style: none;
+        text-align: center;
+    } 
+
+    .h2forecast{
+        padding: 10px 10px;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <div class="w-navbar">
+            <div class="search-container">
+                    <input id="location" name="location" type="text" placeholder="Buscar por pais, región o ciudad">                   
+            </div>
+        </div>
+        <div class="w-body">
+            <div class="current">
+                <h2 id="current">º</h2>
+            </div>
+            <div class="location-container">
+                <div class="location">
+                    <h2 id="nameUbication">...</h2>
+                </div>
+                <div class="time-container">
+                    <div class="time" id="timeHr">
+                    </div>
+                    <div class="date">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-forecast">
+            <nav>
+                <ul class="ulforecast">
+                    <li class="forecast" id="forest1"> ---
+                    </li>
+                    <li class="forecast" id="forest2"> ---
+                    </li>
+                    <li class="forecast" id="forest3"> ---
+                    </li>
+                    <li class="forecast" id="forest4"> ---
+                    </li>
+                    <li class="forecast" id="forest5"> ---
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <a href="#" class="hamburguer-menu">
+            <i class="fa fa-bars fa-2x" aria-hidden="true" style="color: white;"></i>
+        </a>
+
+        <a href="#" class="btn-flotante">
+            <i class="fa fa-plus"></i>
+        </a>
+    </div>
+
+    <div class="mobile-menu ">
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Acerca de</a></li>
+                <li><a href="#" class="active">API</a></li>
+                <li><a href="#" class="active">Recursos</a></li>
+                <li><a href="#" class="active">Información general</a></li>
+            </ul>
+        </nav>
+
+        <a href="#" class="hamburguer-menu-cerrar">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </a>
+    </div>    
+
+    <script src="js/jquery-3.6.0.min.js"></script>
+     <script>
+         
+        $(document).ready(function(){
+            window.onload = metaweathercomplete(116545); //Cargamos datos por default para los datos
+           $("#location").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    var location = $("#location").val();
+                    idlocation = "";
+                    $.ajax({
+                        url: 'metaweather.php',
+                        type:'POST',
+                        dataType: "json",
+                        data: {location:location}, 
+                        success: function(mydata){ 
+                            idlocation = mydata[0].woeid;
+                            metaweathercomplete(idlocation);
+                        },
+                    }); 
+                }
+            });
+
+            function metaweathercomplete(idlocation){
+                    $.ajax({
+                        url: 'metaweathercomplete.php',
+                        type:'POST',
+                        dataType: "json",
+                        data: {idlocation: idlocation}, 
+                        success: function(mydata){ 
+                            vermydata = mydata;
+                            ubicacion_w = vermydata.title
+                            temepratura = vermydata["consolidated_weather"][0].the_temp;
+                            temepratura = Math.round(temepratura)
+                            //hora_w = vermydata.time;
+                            date = new Date();
+                            hora_w = date.getHours() + ":" + (date.getMinutes());
+
+                            $( "#nameUbication" ).html( ""+ubicacion_w+"");
+                            $( "#timeHr" ).html( ""+hora_w+"");
+                            $( "#current" ).html( ""+temepratura+"º");
+                            $( ".date" ).html( "September "+date.getDate()+", "+date.getFullYear()+"" );
+
+                            //Cambiar fondo de pantalla de acuerdo a la temepratura                    
+                                if(temepratura >"23"){ //Soleado
+                                    $(".weather-container").css("background-image", "url(./img/sun2.jpeg)");
+                                }else if (temepratura < "23" && temepratura > "19"){ //Nublado
+                                    $(".weather-container").css("background-image", "url(./img/nubes2.jpeg)");
+                                }else{ //Frio
+                                    $(".weather-container").css("background-image", "url(./img/frio.jpeg)");
+                                }
+                            //Mandar el pronostico de los 4 días proximos
+                            thethemp=[];
+                            thethemp = new Object();
+                            aplicateDate=[];
+                                for(x=0; x<vermydata["consolidated_weather"].length; x++ ){
+                                    thethemp[x] = {max: Math.round (vermydata["consolidated_weather"][x].max_temp), min:Math.round (vermydata["consolidated_weather"][x].min_temp)};
+                                    
+                                    aplicateDate[x] = (vermydata["consolidated_weather"][x].applicable_date);
+
+                                    $( "#forest"+(x+1)+"" ).html( ""+aplicateDate[x]+" <br> <h2 class='h2forecast'>max: "+thethemp[x].max+"º</h2> <br> <h2 'class='h2forecast'>minx: "+thethemp[x].min+"º</h2>");
+                                }
+                        }
+                    }); 
+                }   //Fin funcion metaweathercomplete
+        }); 
+
+            //Desplega menú hamburguesa
+                $(".hamburguer-menu" ).click(function() {
+                    $('.mobile-menu').css('display', 'block');
+                });
+
+                $(".hamburguer-menu-cerrar" ).click(function() {
+                    $('.mobile-menu').css('display', 'none');
+                });
+    </script>
+</body>
+</html>
